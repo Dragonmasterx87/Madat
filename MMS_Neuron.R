@@ -250,3 +250,38 @@ DimPlot(nos1.cells, reduction = "umap")
 # Plot genes
 FeaturePlot(nos1.cells, features = c("Nos1"))
 
+# Selected genes
+markers.to.plot <- c("Nos1", "Chat",  "Vip", "Gal",
+                     "Chrm2", "Chrna3", "Chrnb4", "Htr3a", "Htr2b", "Htr2c", "Glp2r", "Glp1r", "Gipr")
+
+# Dotplot
+DotPlot(nos1.cells,  
+        dot.scale = 8,
+        col.min = -1, #minimum level
+        col.max = 1,  #maximum level
+        features = rev(markers.to.plot)) + 
+  geom_point(aes(size=pct.exp), shape = 21, stroke=0.5) +
+  theme_light() +
+  #facet_wrap(~??? what metadata should be here??)
+  #coord_flip() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.3, hjust=1, size =12, face = "bold", colour = "black")) +
+  theme(axis.text.y = element_text(angle = 0, vjust = 0.3, hjust=1, size =12, face = "bold", colour = "black")) +
+  theme(plot.title = element_text(size = 10, face = "bold"),
+        legend.title=element_text(size=12, face = "bold"), 
+        legend.text=element_text(size=12, face = "bold")) +
+  scale_colour_gradient2(low =c("dodgerblue"), mid = c("white"), high =c("red3")) +
+  guides(color = guide_colorbar(title = 'Average Expression'))
+
+# find markers for every cluster compared to all remaining cells, report only the positive
+# ones
+all.markers.nos1.cells <- FindAllMarkers(nos1.cells, only.pos = TRUE)
+all.markers.nos1.cells %>%
+  group_by(cluster) %>%
+  dplyr::filter(avg_log2FC > 1)
+
+# Plot genes
+FeaturePlot(nos1.cells, features = c("Nos1"))
+
+# Save genes
+write.csv(all.markers.nos1.cells, file = r"(C:\Users\mqadir\Box\Fahd shared with MMS\data\all.markers.nos1.cells.csv)")
+
